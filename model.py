@@ -1,40 +1,105 @@
 import sqlite3
 
-
 class Banco:
 
     def __init__(self):
-        self.conection = sqlite3.connect("base.db")
-        self.createTable()
-
+        self.connection = sqlite3.connect("base.db")
+        self.createTables()
     
-    def createTable(self):
-        cursor = self.conection.cursor()
+    def createTables(self):
 
+        cursor = self.connection.cursor()
+
+        # Criando usuario
         cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            userId INTEGER NOT NULL,
-            username TEXT NOT NULL,
-            hash_pass TEXT NOT NULL,
-            cash DECIMAL DEFAULT 10000.00,
-            PRIMERY KEY (userId)
-        );
-
-        CREATE TABLE IF NOT EXISTS bought (
-            user INTEGER NOT NULL,
-            stock TEXT NOT NULL,
-            price DECIMAL,
-            shares INTEGER,
-            FOREING KEY (user) REFERENCES users(userId)
-        );
-
-        CREATE TABLE IF NOT EXISTS sold (
-            user INTEGER NOT NULL,
-            stock TEXT NOT NULL,
-            price DECIMAL,
-            shares INTEGER,
-            FOREING KEY (user) REFERENCES users(userId)
+        create table if not exists users (
+            id integer primery key,
+            username text not null,
+            hash_pass text not null,
+            cash decimal default 10000.00
         )
         """)
-        self.conection.commit()
+
+        # Criando tabela compra
+        cursor.execute(
+        """
+        create table if not exists buy (
+            user integer foreing key references users(id),
+            stock text not null,
+            price decimal,
+            shares integer
+        )
+        """
+        )
+
+        # Criando tabela venda
+        cursor.execute(
+        """
+        create table if not exists sell (
+            user integer foreing key references users(id),
+            stock text not null,
+            price decimal,
+            shares integer            
+        )
+        """
+        )
+
+        # Criando tabela historico
+        cursor.execute(
+        """
+        create table if not exists history (
+            user integer foreing key references users(id),
+            stock text not null,
+            price decimal,
+            shares integer,
+            operation integer            
+        )
+        """
+        )
+
+        self.connection.commit()
         cursor.close()
+    
+
+    # Inserindo usuarios da tabela
+    def insereUsuario(self, username, password):
+        
+        if len(self.procuraUsername(username)) != 0:
+            return "Usuario ja existente"
+        
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            insert into users (username, hash_pass) VALUES (?, ?)
+            """, (username, password,)
+        )
+
+        self.connection.commit()
+        cursor.close()
+
+        return "Usuario cadastrado com sucesso"
+    
+    # Confere os dados para o login
+    def confereDados(self, username, password):
+
+        user = self.procuraUsername(username)
+        if len(user) != 1:
+            return False
+
+        if user[0][2] != password:
+            return False
+        return True
+
+
+    # Retorna os dados de um usuario especifico
+    def procuraUsername(self, username):
+        cursor = self.connection.cursor()
+
+        cursor.execute("select * from users where username = ?", (username,))
+        self.connection.commit()
+        rows = cursor.fetchall()
+        cursor.close()
+        
+        return rows
+
+        
