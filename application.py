@@ -1,11 +1,16 @@
-from cgitb import text
 from tkinter import *
-from turtle import left
 from model import Banco
 
 db = Banco()
 
-class Login():
+# Aqui vai ficar a interface do usuário
+class App:
+    
+    def __init__(self):
+        pass
+
+
+class Login:
 
     def __init__(self, master=None):
 
@@ -76,13 +81,13 @@ class Login():
             self.resposta["text"] = "Aprovado"
         else:
             self.resposta["text"] = "Usuario ou senha invalidos"
-    
+            
     def registrar(self):
         self.master.destroy()
         root = Tk()
         Register(root)
         root.mainloop()
-    
+
 
 class Register:
 
@@ -160,9 +165,6 @@ class Register:
         Login(root)
         root.mainloop()
 
-
-class App:
-    pass
 
 root = Tk()
 Login(root)
