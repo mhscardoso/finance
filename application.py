@@ -35,6 +35,16 @@ class App:
         self.container4["pady"] = 10
         self.container4.pack()
 
+        # Mensagem de compra
+        self.container5 = Frame(self.master)
+        self.container5["pady"] = 10
+        self.container5.pack()
+
+        # Mensagem de venda
+        self.container6 = Frame(self.master)
+        self.container6["pady"] = 10
+        self.container6.pack()
+
         # Info. do usuario
         self.user = db.procuraUsername(username)[0]
         self.user_id = self.user[0]
@@ -69,22 +79,51 @@ class App:
         self.quotes["width"] = 15
         self.quotes.pack(side=LEFT)
 
+        self.msg_compra = Label(self.container5, text="")
+        self.msg_compra.pack()
+
         def buy():
             price = getLast(self.quote.get())
             try:
-                self.quotes = int(self.quotes.get())
+                quotes = int(self.quotes.get())
             except:
                 return "Error"
             
-            total_value = price * self.quotes
+            total_value = price * quotes
             if self.cash < total_value:
-                return "Not enough"
+                self.msg_compra["text"] = "Dinheiro insuficiente"
             else:
                 self.cash -= total_value
                 self.l_cash["text"] = "{:.2f}".format(self.cash)
+                db.buy_model(self.user_id, self.quote.get(), price, quotes, self.cash)
+                self.msg_compra["text"] = "Compra realizada"
 
         self.buy = Button(self.container4, text="Comprar", command=buy)
         self.buy.pack()
+
+        self.msg_venda = Label(self.container6, text="")
+        self.msg_venda.pack()
+        
+        def sell():
+            remain_shares = db.stocks(self.user_id, self.quote.get())
+            print(remain_shares)
+            if remain_shares == 0:
+                self.msg_venda["text"] = "Impossivel realizar a venda"
+            
+            quotes = int(self.quotes.get())
+            quote = self.quote.get()
+
+            price = getLast(quote)
+            total_gain = price * quotes
+            self.cash += total_gain
+            self.l_cash["text"] = "{:.2f}".format(self.cash)
+            db.sell_model(self.user_id, quote, price, quotes, self.cash)
+            self.msg_venda["text"] = "Venda realizada"
+        
+        self.sell = Button(self.container6, text="Vender", command=sell)
+        self.sell.pack()
+
+
 
 
 class Login:

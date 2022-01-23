@@ -103,6 +103,69 @@ class Banco:
         return rows
     
 
+    def buy_model(self, user_id, stock, price, shares, new_cash):
+        cursor = self.connection.cursor()
+
+        cursor.execute("insert into buy (user, stock, price, shares) values (?, ?, ?, ?)", (user_id, stock, price, shares,))
+        cursor.execute("insert into history (user, stock, price, shares, operation) values (?, ?, ?, ?, ?)", (user_id, stock, price, shares, 0,))
+        cursor.execute("update users set cash = ? where id = ?", (new_cash, user_id,))
+
+        self.connection.commit()
+        cursor.close()
     
 
+    def retornaQuoteComprada(self, user_id, quote):
+        cursor = self.connection.cursor()
+
+        cursor.execute("select * from buy where user = ? and stock = ?", (user_id, quote,))
+        self.connection.commit()
+        rows_bought = cursor.fetchall()
+        cursor.close()
+        
+        return rows_bought
+
+    def retornaQuoteVedida(self, user_id, quote):
+        cursor = self.connection.cursor()
+
+        cursor.execute("select * from sell where user = ? and stock = ?", (user_id, quote,))
+        self.connection.commit()
+        rows_sold = cursor.fetchall()
+        cursor.close()
+        
+        return rows_sold
+    
+    def stocks(self, user_id, quote):
+        comprados = self.retornaQuoteComprada(user_id, quote)
+
+        if len(comprados) == 0:
+            return 0
+
+        vendidos = self.retornaQuoteVedida(user_id, quote)
+
+        shares_compradas = 0
+        shares_vendidas = 0
+
+        for operation in comprados:
+            shares_compradas += operation[3]
+        
+        if len(vendidos) == 0:
+            return shares_compradas
+        
+        for operation in vendidos:
+            shares_vendidas += operation[3]
+
+        remain_shares = shares_compradas - shares_vendidas
+        return remain_shares
+    
+
+    def sell_model(self, user_id, stock, price, shares, new_cash):
+        cursor = self.connection.cursor()
+
+        cursor.execute("insert into sell (user, stock, price, shares) values (?, ?, ?, ?)", (user_id, stock, price, shares,))
+        cursor.execute("insert into history (user, stock, price, shares, operation) values (?, ?, ?, ?, ?)", (user_id, stock, price, shares, 1,))
+        cursor.execute("update users set cash = ? where id = ?", (new_cash, user_id,))
+
+        self.connection.commit()
+        cursor.close()
+        
         
