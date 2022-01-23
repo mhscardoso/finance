@@ -1,13 +1,90 @@
 from tkinter import *
+from tkinter import ttk
+from matplotlib import container
 from model import Banco
+from controller import *
 
 db = Banco()
 
 # Aqui vai ficar a interface do usuário
 class App:
     
-    def __init__(self):
-        pass
+    def __init__(self, master=None, username=None):
+        self.master = master
+        self.master.title("Finance")
+
+        # Containers para os elementos
+
+        # Container para dizer olah
+        self.container1 = Frame(self.master)
+        self.container1["pady"] = 10
+        self.container1.pack()
+
+        # Container para texto
+        self.container2 = Frame(self.master)
+        self.container2["pady"] = 10
+        self.container2.pack()
+
+        # Container para o preco
+        self.container3 = Frame(self.master)
+        self.container3["pady"] = 10
+        self.container3.pack()
+
+        # Parte de compra
+        self.container4 = Frame(self.master)
+        self.container4["pady"] = 10
+        self.container4.pack()
+
+        # Info. do usuario
+        self.user = db.procuraUsername(username)[0]
+        self.user_id = self.user[0]
+        self.cash = self.user[3]
+
+        # Mensagem de olah
+        self.hello = Label(self.container1, text=f"Olá, {username}")
+        self.hello.pack(side=LEFT)
+
+        self.l_cash = Label(self.container1, text="{:.2f}".format(self.cash))
+        self.l_cash.pack()
+
+        # Campo de entrada da stock
+        self.quote = Entry(self.container2)
+        self.quote["width"] = 15
+        self.quote.pack(side=LEFT)
+
+        def search():
+            quote = self.quote.get()
+            last = getLast(quote)
+            self.msg["text"] = "Ultimo preco: US$ {:.2f}".format(last)
+
+        self.search = Button(self.container2, text="Procurar", command=search)
+        self.search.pack()
+
+        # Mensagem de preco
+        self.msg = Label(self.container3, text="")
+        self.msg.pack()
+
+        # Entry de quantidade de acoes
+        self.quotes = Entry(self.container4)
+        self.quotes["width"] = 15
+        self.quotes.pack(side=LEFT)
+
+        def buy():
+            price = getLast(self.quote.get())
+            try:
+                self.quotes = int(self.quotes.get())
+            except:
+                return "Error"
+            
+            total_value = price * self.quotes
+            if self.cash < total_value:
+                return "Not enough"
+            else:
+                self.cash -= total_value
+                self.l_cash["text"] = "{:.2f}".format(self.cash)
+
+        self.buy = Button(self.container4, text="Comprar", command=buy)
+        self.buy.pack()
 
 
 class Login:
@@ -79,6 +156,12 @@ class Login:
     def login(self):
         if db.confereDados(self.user.get(), self.passw.get()):
             self.resposta["text"] = "Aprovado"
+            username = db.procuraUsername(self.user.get())[0][1]
+            self.master.destroy()
+            root = Tk()
+            App(root, username)
+            root.mainloop()
+
         else:
             self.resposta["text"] = "Usuario ou senha invalidos"
             

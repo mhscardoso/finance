@@ -101,5 +101,8 @@ class Banco:
         cursor.close()
         
         return rows
+    
+
+    
 
         
