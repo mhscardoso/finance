@@ -109,9 +109,14 @@ class App:
             print(remain_shares)
             if remain_shares == 0:
                 self.msg_venda["text"] = "Impossivel realizar a venda"
+                return
             
             quotes = int(self.quotes.get())
             quote = self.quote.get()
+
+            if quotes > remain_shares:
+                self.msg_venda["text"] = "Impossivel realizar a venda"
+                return
 
             price = getLast(quote)
             total_gain = price * quotes
@@ -122,8 +127,6 @@ class App:
         
         self.sell = Button(self.container6, text="Vender", command=sell)
         self.sell.pack()
-
-
 
 
 class Login:
