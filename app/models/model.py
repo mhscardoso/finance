@@ -3,7 +3,7 @@ import sqlite3
 class Banco:
 
     def __init__(self):
-        self.connection = sqlite3.connect("base.db")
+        self.connection = sqlite3.connect("../../base.db")
         self.createTables()
     
     def createTables(self):
@@ -106,8 +106,8 @@ class Banco:
     def buy_model(self, user_id, stock, price, shares, new_cash):
         cursor = self.connection.cursor()
 
-        cursor.execute("insert into buy (user, stock, price, shares) values (?, ?, ?, ?)", (user_id, stock, price, shares,))
-        cursor.execute("insert into history (user, stock, price, shares, operation) values (?, ?, ?, ?, ?)", (user_id, stock, price, shares, 0,))
+        cursor.execute("insert into buy (user, stock, price, shares) values (?, ?, ?, ?)", (user_id, stock.upper(), price, shares,))
+        cursor.execute("insert into history (user, stock, price, shares, operation) values (?, ?, ?, ?, ?)", (user_id, stock.upper(), price, shares, 0,))
         cursor.execute("update users set cash = ? where id = ?", (new_cash, user_id,))
 
         self.connection.commit()
@@ -133,6 +133,7 @@ class Banco:
         cursor.close()
         
         return rows_sold
+    
     
     def stocks(self, user_id, quote):
         comprados = self.retornaQuoteComprada(user_id, quote)
@@ -161,11 +162,13 @@ class Banco:
     def sell_model(self, user_id, stock, price, shares, new_cash):
         cursor = self.connection.cursor()
 
-        cursor.execute("insert into sell (user, stock, price, shares) values (?, ?, ?, ?)", (user_id, stock, price, shares,))
-        cursor.execute("insert into history (user, stock, price, shares, operation) values (?, ?, ?, ?, ?)", (user_id, stock, price, shares, 1,))
+        cursor.execute("insert into sell (user, stock, price, shares) values (?, ?, ?, ?)", (user_id, stock.upper(), price, shares,))
+        cursor.execute("insert into history (user, stock, price, shares, operation) values (?, ?, ?, ?, ?)", (user_id, stock.upper(), price, shares, 1,))
         cursor.execute("update users set cash = ? where id = ?", (new_cash, user_id,))
 
         self.connection.commit()
         cursor.close()
         
+    
+
         

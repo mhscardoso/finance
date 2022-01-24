@@ -1,2 +1,5 @@
 base.db
 __pycache__/
+app/controller/__pycache__/
+app/models/__pycache__/
+app/views/__pycache__/
