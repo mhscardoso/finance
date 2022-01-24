@@ -107,8 +107,21 @@ class App:
         self.cash2["bg"] = "white"
         self.cash2.pack(side=RIGHT)
 
+        # Cabecalho da tabela          
+        self.table2 = Frame(self.frame_history, width=600)
+        self.table2["pady"] = 20
+        self.table2.pack()
+
         # Cabecalho da tabela
-        
+        table_items2 = ["Stock", "Preco", "Shares", "Operacao"]
+
+        for item in table_items2:
+            c1 = Label(self.table2, text = item, font = self.font_table_head)
+            c1["padx"] = 40
+            c1["pady"] = 10
+            c1.grid(row = 0, column = table_items2.index(item))
+
+        self.show_history()        
         # ----------------------------------------------------------------------------
 
 
@@ -290,6 +303,8 @@ class App:
             self.atualizaCash(self.user_cash)
             db.buy_model(self.user_id, self.buy_entry.get().upper(), price, quotes, self.user_cash)
             self.info_buy["text"] = "Compra realizada"
+        
+        self.show_history()
     
 
     # Rapida atualizacao
@@ -305,7 +320,6 @@ class App:
     
     def sell(self):
         remain_shares = db.stocks(self.user_id, self.sell_entry.get())
-        print(remain_shares)
         if remain_shares == 0:
             self.info_sell["text"] = "Impossivel realizar a venda"
             return
@@ -327,6 +341,41 @@ class App:
         self.atualizaCash(self.user_cash)
         db.sell_model(self.user_id, quote, price, quotes, self.user_cash)
         self.info_sell["text"] = "Venda realizada"
+
+        self.show_history()
+
+    
+    def show_history(self):
+        history = db.get_history(self.user_id)
+
+        history = reversed(history)
+        history = list(history)
+
+        for op in history:
+            for i in range(1, 5):
+                if i == 4:
+                    if op[i] == 0:
+                        c1 = Label(self.table2, text = "Compra")
+                        c1["padx"] = 40
+                        c1["pady"] = 5
+                        c1.grid(row = history.index(op) + 1, column = i - 1)
+                    else:
+                        c1 = Label(self.table2, text = "Venda")
+                        c1["padx"] = 40
+                        c1["pady"] = 5
+                        c1.grid(row = history.index(op) + 1, column = i - 1)
+                elif i == 2:
+                    c1 = Label(self.table2, text = "{:.2f}".format(op[i]))
+                    c1["padx"] = 40
+                    c1["pady"] = 5
+                    c1.grid(row = history.index(op) + 1, column = i - 1)
+                
+                else:
+                    c1 = Label(self.table2, text = op[i])
+                    c1["padx"] = 40
+                    c1["pady"] = 5
+                    c1.grid(row = history.index(op) + 1, column = i - 1)
+
     
 
 root = Tk()

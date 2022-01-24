@@ -117,7 +117,7 @@ class Banco:
     def retornaQuoteComprada(self, user_id, quote):
         cursor = self.connection.cursor()
 
-        cursor.execute("select * from buy where user = ? and stock = ?", (user_id, quote,))
+        cursor.execute("select * from buy where user = ? and stock = ?", (user_id, quote.upper(),))
         self.connection.commit()
         rows_bought = cursor.fetchall()
         cursor.close()
@@ -127,7 +127,7 @@ class Banco:
     def retornaQuoteVedida(self, user_id, quote):
         cursor = self.connection.cursor()
 
-        cursor.execute("select * from sell where user = ? and stock = ?", (user_id, quote,))
+        cursor.execute("select * from sell where user = ? and stock = ?", (user_id, quote.upper(),))
         self.connection.commit()
         rows_sold = cursor.fetchall()
         cursor.close()
@@ -168,6 +168,17 @@ class Banco:
 
         self.connection.commit()
         cursor.close()
+
+    
+    def get_history(self, user_id):
+        cursor = self.connection.cursor()
+
+        cursor.execute("select * from history where user = ?", (user_id,))
+        history = cursor.fetchall()
+        self.connection.commit()
+        cursor.close()
+        
+        return history
         
     
 
