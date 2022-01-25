@@ -2,6 +2,13 @@ from tkinter import *
 from tkinter import ttk
 import os, sys
 
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg, NavigationToolbar2Tk)
+
+from matplotlib.figure import Figure
+from PIL import Image, ImageTk
+
+
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -45,11 +52,11 @@ class App:
         self.frame_graph = Frame(self.abas)
 
         self.abas.add(self.frame_start, text="Inicio")
-        self.abas.add(self.frame_history, text="Historico")
+        self.abas.add(self.frame_history, text="Histórico")
         self.abas.add(self.frame_search, text="Procura")
         self.abas.add(self.frame_buy, text="Compra")
         self.abas.add(self.frame_sell, text="Venda")
-        self.abas.add(self.frame_graph, text="Grafico")
+        self.abas.add(self.frame_graph, text="Gráfico")
 
         self.abas.pack(expand=1, fill="both")
 
@@ -60,7 +67,7 @@ class App:
         self.barra_top1["bg"] = "white"
         self.barra_top1.pack(fill="x")
 
-        self.user1 = Label(self.barra_top1, text="Ola, {}".format(self.username))
+        self.user1 = Label(self.barra_top1, text="Olá, {}".format(self.username))
         self.user1["padx"] = 150
         self.user1["bg"] = "white"
         self.user1.pack(side=LEFT)
@@ -76,7 +83,7 @@ class App:
         self.table1.pack()
 
         # Cabecalho da tabela
-        table_items = ["Stock", "Shares", "Preco", "Total"]
+        table_items = ["Ação", "Qtd", "Preço", "Total"]
 
         for item in table_items:
             c1 = Label(self.table1, text = item, font = self.font_table_head)
@@ -97,7 +104,7 @@ class App:
         self.barra_top2["bg"] = "white"
         self.barra_top2.pack(fill="x")
 
-        self.user2 = Label(self.barra_top2, text="Ola, {}".format(self.username))
+        self.user2 = Label(self.barra_top2, text="Olá, {}".format(self.username))
         self.user2["padx"] = 150
         self.user2["bg"] = "white"
         self.user2.pack(side=LEFT)
@@ -113,7 +120,7 @@ class App:
         self.table2.pack()
 
         # Cabecalho da tabela
-        table_items2 = ["Stock", "Preco", "Shares", "Operacao"]
+        table_items2 = ["Ação", "Preço", "Qtd.", "Operação"]
 
         for item in table_items2:
             c1 = Label(self.table2, text = item, font = self.font_table_head)
@@ -132,7 +139,7 @@ class App:
         self.barra_top3["bg"] = "white"
         self.barra_top3.pack(fill="x")
 
-        self.user3 = Label(self.barra_top3, text="Ola, {}".format(self.username))
+        self.user3 = Label(self.barra_top3, text="Olá, {}".format(self.username))
         self.user3["padx"] = 150
         self.user3["bg"] = "white"
         self.user3.pack(side=LEFT)
@@ -147,7 +154,7 @@ class App:
         self.form1["pady"] = 20
         self.form1.pack()
 
-        self.msg_info = Label(self.form1, text="Digite o codigo da acao: ")
+        self.msg_info = Label(self.form1, text="Digite o código da ação: ")
         self.msg_info.grid(row = 0, column = 0)
 
         self.search_entry = Entry(self.form1)
@@ -171,7 +178,7 @@ class App:
         self.barra_top4["bg"] = "white"
         self.barra_top4.pack(fill="x")
 
-        self.user4 = Label(self.barra_top4, text="Ola, {}".format(self.username))
+        self.user4 = Label(self.barra_top4, text="Olá, {}".format(self.username))
         self.user4["padx"] = 150
         self.user4["bg"] = "white"
         self.user4.pack(side=LEFT)
@@ -186,7 +193,7 @@ class App:
         self.form2["pady"] = 20
         self.form2.pack()
 
-        self.msg_info_compra = Label(self.form2, text="Digite o codigo da acao: ")
+        self.msg_info_compra = Label(self.form2, text="Digite o código da ação: ")
         self.msg_info_compra["pady"] = 10
         self.msg_info_compra.grid(row = 0, column = 0)
 
@@ -194,7 +201,7 @@ class App:
         self.buy_entry["width"] = 15
         self.buy_entry.grid(row = 0, column = 1)
 
-        self.msg_info_quotes = Label(self.form2, text="Digite quantas acoes: ")
+        self.msg_info_quotes = Label(self.form2, text="Digite quantas ações: ")
         self.msg_info_quotes["pady"] = 10
         self.msg_info_quotes.grid(row = 1, column = 0)
 
@@ -219,7 +226,7 @@ class App:
         self.barra_top5["bg"] = "white"
         self.barra_top5.pack(fill="x")
 
-        self.user5 = Label(self.barra_top5, text="Ola, {}".format(self.username))
+        self.user5 = Label(self.barra_top5, text="Olá, {}".format(self.username))
         self.user5["padx"] = 150
         self.user5["bg"] = "white"
         self.user5.pack(side=LEFT)
@@ -234,7 +241,7 @@ class App:
         self.form3["pady"] = 20
         self.form3.pack()
 
-        self.msg_info_venda = Label(self.form3, text="Digite o codigo da acao: ")
+        self.msg_info_venda = Label(self.form3, text="Digite o código da acao: ")
         self.msg_info_venda["pady"] = 10
         self.msg_info_venda.grid(row = 0, column = 0)
 
@@ -242,7 +249,7 @@ class App:
         self.sell_entry["width"] = 15
         self.sell_entry.grid(row = 0, column = 1)
 
-        self.msg_info_quotes_sell = Label(self.form3, text="Digite quantas acoes: ")
+        self.msg_info_quotes_sell = Label(self.form3, text="Digite quantas ações: ")
         self.msg_info_quotes_sell["pady"] = 10
         self.msg_info_quotes_sell.grid(row = 1, column = 0)
 
@@ -267,7 +274,7 @@ class App:
         self.barra_top6["bg"] = "white"
         self.barra_top6.pack(fill="x")
 
-        self.user6 = Label(self.barra_top6, text="Ola, {}".format(self.username))
+        self.user6 = Label(self.barra_top6, text="Olá, {}".format(self.username))
         self.user6["padx"] = 150
         self.user6["bg"] = "white"
         self.user6.pack(side=LEFT)
@@ -276,6 +283,10 @@ class App:
         self.cash6["padx"] = 150
         self.cash6["bg"] = "white"
         self.cash6.pack(side=RIGHT)
+
+        self.canvas = FigureCanvasTkAgg(generateGraph("AAPL", 1), self.frame_graph)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
         # ---------------------------------------------------------------------------
 
 
@@ -320,18 +331,18 @@ class App:
     def sell(self):
         remain_shares = db.stocks(self.user_id, self.sell_entry.get())
         if remain_shares == 0:
-            self.info_sell["text"] = "Impossivel realizar a venda"
+            self.info_sell["text"] = "Impossível realizar a venda"
             return
         
         try:
             quotes = int(self.quotes_sell_entry.get())
         except:
-            self.info_sell["text"] = "O segundo campo deve ser um numero"
+            self.info_sell["text"] = "O segundo campo deve ser um número"
             return
         quote = self.sell_entry.get()
 
         if quotes > remain_shares:
-            self.info_sell["text"] = "Impossivel realizar a venda"
+            self.info_sell["text"] = "Impossível realizar a venda"
             return
 
         price = getLast(quote)
