@@ -7,8 +7,8 @@ sys.path.append(parentdir)
 
 from models.model import Banco
 
-from register import Register
-from application import App
+from views.register import Register
+from views.application import App
 
 db = Banco()
 
@@ -95,7 +95,3 @@ class Login:
         root = Tk()
         Register(root)
         root.mainloop()
-
-root = Tk()
-Login(root)
-root.mainloop()

@@ -13,7 +13,7 @@ class Banco:
         # Criando usuario
         cursor.execute("""
         create table if not exists users (
-            id integer primery key,
+            id integer primary key,
             username text not null,
             hash_pass text not null,
             cash decimal default 10000.00
@@ -53,6 +53,16 @@ class Banco:
             price decimal,
             shares integer,
             operation integer            
+        )
+        """
+        )
+
+        cursor.execute(
+        """
+        create table if not exists pertences (
+            user integer foreing key references users(id),
+            stock text not null,
+            shares integer           
         )
         """
         )
@@ -109,6 +119,21 @@ class Banco:
         cursor.execute("insert into buy (user, stock, price, shares) values (?, ?, ?, ?)", (user_id, stock.upper(), price, shares,))
         cursor.execute("insert into history (user, stock, price, shares, operation) values (?, ?, ?, ?, ?)", (user_id, stock.upper(), price, shares, 0,))
         cursor.execute("update users set cash = ? where id = ?", (new_cash, user_id,))
+        cursor.execute("select * from pertences where user = ? and stock = ?", (user_id, stock.upper(),))
+
+        verifica = cursor.fetchall()
+
+        self.connection.commit()
+        cursor.close()
+
+        cursor = self.connection.cursor()
+
+        if len(verifica) == 0:
+            cursor.execute("insert into pertences (user, stock, shares) values (?, ?, ?)", (user_id, stock.upper(), shares,))
+        else:
+            actual_shares = verifica[0][2]
+            total_shares = actual_shares + shares
+            cursor.execute("update pertences set shares = ? where user = ? and stock = ?", (total_shares, user_id, stock.upper(),))
 
         self.connection.commit()
         cursor.close()
@@ -165,6 +190,20 @@ class Banco:
         cursor.execute("insert into sell (user, stock, price, shares) values (?, ?, ?, ?)", (user_id, stock.upper(), price, shares,))
         cursor.execute("insert into history (user, stock, price, shares, operation) values (?, ?, ?, ?, ?)", (user_id, stock.upper(), price, shares, 1,))
         cursor.execute("update users set cash = ? where id = ?", (new_cash, user_id,))
+        cursor.execute("select * from pertences where user = ? and stock = ?", (user_id, stock.upper(),))
+
+        verifica = cursor.fetchall()
+
+        actual_shares = verifica[0][2]
+
+        total_shares = actual_shares - shares
+
+        self.connection.commit()
+        cursor.close()
+
+        cursor = self.connection.cursor()
+
+        cursor.execute("update pertences set shares = ? where user = ? and stock = ?", (total_shares, user_id, stock.upper(),))
 
         self.connection.commit()
         cursor.close()
@@ -177,8 +216,25 @@ class Banco:
         history = cursor.fetchall()
         self.connection.commit()
         cursor.close()
-        
+
         return history
+
+    
+    def verPertences(self, user_id):
+        cursor = self.connection.cursor()
+
+        cursor.execute("select * from pertences where user = ?", (user_id,))
+        todos = cursor.fetchall()
+
+        todos = sorted(todos, key=lambda x: x[2], reverse=True)
+
+        self.connection.commit()
+        cursor.close()
+
+        return todos
+    
+
+
         
     
 

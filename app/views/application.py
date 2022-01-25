@@ -1,9 +1,6 @@
 from tkinter import *
 from tkinter import ttk
 import os, sys
-from turtle import width
-
-from matplotlib.pyplot import text
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -54,13 +51,14 @@ class App:
         self.abas.add(self.frame_sell, text="Venda")
         self.abas.add(self.frame_graph, text="Grafico")
 
+        self.abas.pack(expand=1, fill="both")
 
         # Tela de inicio -------------------------------------------------------------
         # Barra de topo
         self.barra_top1 = Frame(self.frame_start)
         self.barra_top1["pady"] = 10
         self.barra_top1["bg"] = "white"
-        self.barra_top1.pack()
+        self.barra_top1.pack(fill="x")
 
         self.user1 = Label(self.barra_top1, text="Ola, {}".format(self.username))
         self.user1["padx"] = 150
@@ -85,6 +83,8 @@ class App:
             c1["padx"] = 40
             c1["pady"] = 10
             c1.grid(row = 0, column = table_items.index(item))
+        
+        self.mostraPertences()
 
 
         # ----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ class App:
         self.barra_top2 = Frame(self.frame_history)
         self.barra_top2["pady"] = 10
         self.barra_top2["bg"] = "white"
-        self.barra_top2.pack()
+        self.barra_top2.pack(fill="x")
 
         self.user2 = Label(self.barra_top2, text="Ola, {}".format(self.username))
         self.user2["padx"] = 150
@@ -130,7 +130,7 @@ class App:
         self.barra_top3 = Frame(self.frame_search)
         self.barra_top3["pady"] = 10
         self.barra_top3["bg"] = "white"
-        self.barra_top3.pack()
+        self.barra_top3.pack(fill="x")
 
         self.user3 = Label(self.barra_top3, text="Ola, {}".format(self.username))
         self.user3["padx"] = 150
@@ -169,7 +169,7 @@ class App:
         self.barra_top4 = Frame(self.frame_buy)
         self.barra_top4["pady"] = 10
         self.barra_top4["bg"] = "white"
-        self.barra_top4.pack()
+        self.barra_top4.pack(fill="x")
 
         self.user4 = Label(self.barra_top4, text="Ola, {}".format(self.username))
         self.user4["padx"] = 150
@@ -217,7 +217,7 @@ class App:
         self.barra_top5 = Frame(self.frame_sell)
         self.barra_top5["pady"] = 10
         self.barra_top5["bg"] = "white"
-        self.barra_top5.pack()
+        self.barra_top5.pack(fill="x")
 
         self.user5 = Label(self.barra_top5, text="Ola, {}".format(self.username))
         self.user5["padx"] = 150
@@ -265,7 +265,7 @@ class App:
         self.barra_top6 = Frame(self.frame_graph)
         self.barra_top6["pady"] = 10
         self.barra_top6["bg"] = "white"
-        self.barra_top6.pack()
+        self.barra_top6.pack(fill="x")
 
         self.user6 = Label(self.barra_top6, text="Ola, {}".format(self.username))
         self.user6["padx"] = 150
@@ -277,7 +277,6 @@ class App:
         self.cash6["bg"] = "white"
         self.cash6.pack(side=RIGHT)
         # ---------------------------------------------------------------------------
-
 
 
     # Funcao para procurar a acao
@@ -305,6 +304,7 @@ class App:
             self.info_buy["text"] = "Compra realizada"
         
         self.show_history()
+        self.mostraPertences()
     
 
     # Rapida atualizacao
@@ -316,8 +316,7 @@ class App:
         self.cash5["text"] = "US$ {:.2f}".format(new_cash)
         self.cash6["text"] = "US$ {:.2f}".format(new_cash)
 
-    
-    
+    # Parte visivel da venda    
     def sell(self):
         remain_shares = db.stocks(self.user_id, self.sell_entry.get())
         if remain_shares == 0:
@@ -343,6 +342,7 @@ class App:
         self.info_sell["text"] = "Venda realizada"
 
         self.show_history()
+        self.mostraPertences()
 
     
     def show_history(self):
@@ -375,9 +375,56 @@ class App:
                     c1["padx"] = 40
                     c1["pady"] = 5
                     c1.grid(row = history.index(op) + 1, column = i - 1)
-
     
 
-root = Tk()
-App(root, "Matheus")
-root.mainloop()
+    def mostraPertences(self):
+        pertences = db.verPertences(self.user_id)
+
+        pertences = reversed(pertences)
+        pertences = list(pertences)
+        
+        price = 0
+        total = 0
+
+        for op in pertences:
+            for i in range(1, 5):
+                if op[2] != 0:
+                    if i < 3:
+                        c1 = Label(self.table1, text = op[i])
+                        c1["padx"] = 40
+                        c1["pady"] = 5
+                        c1.grid(row = pertences.index(op) + 1, column = i - 1)
+                    elif i == 3:
+                        price = getLast(op[1])
+                        c1 = Label(self.table1, text = "{:.2f}".format(price))
+                        c1["padx"] = 40
+                        c1["pady"] = 5
+                        c1.grid(row = pertences.index(op) + 1, column = i - 1)
+                    elif i == 4:
+                        total = price * op[2]
+                        c1 = Label(self.table1, text = "{:.2f}".format(total))
+                        c1["padx"] = 40
+                        c1["pady"] = 5
+                        c1.grid(row = pertences.index(op) + 1, column = i - 1)
+                else:
+                    if i < 3:
+                        c1 = Label(self.table1, text = "")
+                        c1["padx"] = 40
+                        c1["pady"] = 5
+                        c1.grid(row = pertences.index(op) + 1, column = i - 1)
+                    elif i == 3:
+                        price = getLast(op[1])
+                        c1 = Label(self.table1, text = "")
+                        c1["padx"] = 40
+                        c1["pady"] = 5
+                        c1.grid(row = pertences.index(op) + 1, column = i - 1)
+                    elif i == 4:
+                        total = price * op[2]
+                        c1 = Label(self.table1, text = "")
+                        c1["padx"] = 40
+                        c1["pady"] = 5
+                        c1.grid(row = pertences.index(op) + 1, column = i - 1)
+    
+
+
+
