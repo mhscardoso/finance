@@ -44,19 +44,18 @@ def getMany(stock: str, code: int = None):
         return
     return data[["Open", "High", "Low", "Close", "Volume"]]
 
-"""
-mpf.plot(df, type='candle', style='charles',
-            title='S&P 500, Nov 2019',
-            ylabel='Price ($)',
-            ylabel_lower='Shares \nTraded',
-            volume=True)
-"""
-
 
 def generateGraph(stock, tipo):
     data = getMany(stock, tipo)
-    fig, ax = mpf.plot(data, type="candle", style="charles", title=stock.upper(), ylabel="Preço", ylabel_lower="Shares /nTraded", volume=True, returnfig=True)
-    return fig
+
+    if tipo == 1:
+        info = "Um mês - Gráfico Diário"
+    elif tipo == 2:
+        info = "2 dias - Gráfico de uma hora"
+    else:
+        info = "1 dia - Gráfico de 5 min."
+
+    return mpf.plot(data, type=f"candle", style="charles", title=f"{stock.upper()} - {info}", ylabel="Preço", ylabel_lower="Shares Traded", volume=True, returnfig=True)
 
 
 

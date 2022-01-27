@@ -284,9 +284,38 @@ class App:
         self.cash6["bg"] = "white"
         self.cash6.pack(side=RIGHT)
 
-        self.canvas = FigureCanvasTkAgg(generateGraph("AAPL", 1), self.frame_graph)
+        self.container = Frame(self.frame_graph)
+        self.container.pack()
+
+        self.lb_graph = Label(self.container, text="Digite uma ação: ")
+        self.lb_graph.pack(side=LEFT)
+
+        self.tx_graph = Entry(self.container)
+        self.tx_graph.pack()
+
+        n = StringVar()
+        self.monthchoosen = ttk.Combobox(self.frame_graph, width = 27, textvariable = n)
+        
+        # Adding combobox drop down list
+        self.monthchoosen['values'] = ("1 mês - Diário",
+                                       "2 dias - 1 hora",
+                                       "1 dia - 5 min.")
+        
+        self.monthchoosen.pack()
+        self.monthchoosen.current()
+
+        self.btn_graph = Button(self.frame_graph, text="Atualizar gráfico", command=self.graph)
+        self.btn_graph.pack()
+
+        self.fig, self.ax = generateGraph("AAPL", 2)
+
+        self.frame_graph_all = Frame(self.frame_graph)
+        self.frame_graph_all.pack()
+
+        self.canvas = FigureCanvasTkAgg(self.fig, self.frame_graph_all)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        
         # ---------------------------------------------------------------------------
 
 
@@ -437,5 +466,28 @@ class App:
                         c1.grid(row = pertences.index(op) + 1, column = i - 1)
     
 
+    def graph(self):
+        value = self.tx_graph.get()
+        self.ax.clear()
 
+        if self.monthchoosen.get() == "1 mês - Diário":
+            info = 1
+        elif self.monthchoosen.get() == "2 dias - 1 hora":
+            info = 2
+        elif self.monthchoosen.get() == "1 dia - 5 min.":
+            info = 3
+
+        self.fig, self.ax = generateGraph(value, info)
+
+        self.frame_graph_all.destroy()
+
+        self.frame_graph_all = Frame(self.frame_graph)
+        self.frame_graph_all.pack()
+
+        self.canvas = FigureCanvasTkAgg(self.fig, self.frame_graph_all)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 

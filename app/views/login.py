@@ -95,3 +95,7 @@ class Login:
         root = Tk()
         Register(root)
         root.mainloop()
+
+root = Tk()
+Login(root)
+root.mainloop()
